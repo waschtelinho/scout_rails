@@ -1,9 +1,9 @@
-module ScoutRailsProxy::Instruments
+module ScoutRails::Instruments
   # Contains ActiveRecord instrument, aliasing +ActiveRecord::ConnectionAdapters::AbstractAdapter#log+ calls
   # to trace calls to the database. 
   module ActiveRecordInstruments
     def self.included(instrumented_class)
-      ScoutRailsProxy::Agent.instance.logger.debug "Instrumenting #{instrumented_class.inspect}"
+      ScoutRails::Agent.instance.logger.debug "Instrumenting #{instrumented_class.inspect}"
       instrumented_class.class_eval do
         unless instrumented_class.method_defined?(:log_without_scout_instruments)
           alias_method :log_without_scout_instruments, :log
@@ -62,20 +62,20 @@ end # module Instruments
 def add_instruments
   if defined?(ActiveRecord) && defined?(ActiveRecord::Base)
     ActiveRecord::ConnectionAdapters::AbstractAdapter.module_eval do
-      include ::ScoutRailsProxy::Instruments::ActiveRecordInstruments
-      include ::ScoutRailsProxy::Tracer
+      include ::ScoutRails::Instruments::ActiveRecordInstruments
+      include ::ScoutRails::Tracer
     end
     ActiveRecord::Base.class_eval do
-       include ::ScoutRailsProxy::Tracer
+       include ::ScoutRails::Tracer
     end
   end
 rescue
-  ScoutRailsProxy::Agent.instance.logger.warn "ActiveRecord instrumentation exception: #{$!.message}"
+  ScoutRails::Agent.instance.logger.warn "ActiveRecord instrumentation exception: #{$!.message}"
 end
 
 if defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 3
   Rails.configuration.after_initialize do
-    ScoutRailsProxy::Agent.instance.logger.debug "Adding ActiveRecord instrumentation to a Rails 3 app"
+    ScoutRails::Agent.instance.logger.debug "Adding ActiveRecord instrumentation to a Rails 3 app"
     add_instruments
   end
 else

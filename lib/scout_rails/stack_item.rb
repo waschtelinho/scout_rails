@@ -1,4 +1,4 @@
-class ScoutRailsProxy::StackItem
+class ScoutRails::StackItem
   attr_accessor :children_time
   attr_reader :metric_name, :start_time 
   

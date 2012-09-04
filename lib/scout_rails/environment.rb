@@ -1,5 +1,5 @@
 # Used to retrieve environment information for this application.
-module ScoutRailsProxy
+module ScoutRails
   class Environment
     def env
       @env ||= case framework

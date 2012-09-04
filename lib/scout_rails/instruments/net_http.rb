@@ -1,7 +1,7 @@
 if defined?(::Net) && defined?(Net::HTTP)
-  ScoutRailsProxy::Agent.instance.logger.debug "Instrumenting Net::HTTP"
+  ScoutRails::Agent.instance.logger.debug "Instrumenting Net::HTTP"
   Net::HTTP.class_eval do
-    include ScoutRailsProxy::Tracer
+    include ScoutRails::Tracer
     
     def request_with_scout_instruments(*args,&block)
       self.class.instrument("HTTP/request", :desc => "#{(@address+args.first.path.split('?').first)[0..99]}") do

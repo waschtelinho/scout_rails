@@ -1,5 +1,5 @@
 # Contains the meta information associated with a metric. Used to lookup Metrics in to Store's metric_hash.
-class ScoutRailsProxy::MetricMeta
+class ScoutRails::MetricMeta
   def initialize(metric_name, options = {})
     @metric_name = metric_name
     @metric_id = nil

@@ -1,4 +1,4 @@
-module ScoutRailsProxy::Instruments
+module ScoutRails::Instruments
   module SinatraInstruments
     def route_eval_with_scout_instruments(&blockarg)
       path = unescape(@request.path_info)
@@ -20,13 +20,13 @@ module ScoutRailsProxy::Instruments
       end
     end # route_eval_with_scout_instrumentss
   end # SinatraInstruments
-end # ScoutRailsProxy::Instruments
+end # ScoutRails::Instruments
 
 if defined?(::Sinatra) && defined?(::Sinatra::Base)
-  ScoutRailsProxy::Agent.instance.logger.debug "Instrumenting Sinatra"
+  ScoutRails::Agent.instance.logger.debug "Instrumenting Sinatra"
   ::Sinatra::Base.class_eval do
-    include ScoutRailsProxy::Tracer
-    include ::ScoutRailsProxy::Instruments::SinatraInstruments
+    include ScoutRails::Tracer
+    include ::ScoutRails::Instruments::SinatraInstruments
     alias route_eval_without_scout_instruments route_eval
     alias route_eval route_eval_with_scout_instruments
   end

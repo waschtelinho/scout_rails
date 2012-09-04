@@ -1,4 +1,4 @@
-# ScoutRailsProxy
+# ScoutRails
 
 A Ruby gem for detailed Rails application performance analysis. Metrics are reported to [Scout](https://scoutapp.com), a hosted server and application monitoring service. For general server monitoring, see our [server monitoring agent](https://github.com/scoutapp/scout-client).
 
@@ -8,9 +8,9 @@ A Ruby gem for detailed Rails application performance analysis. Metrics are repo
 
 Install the gem:
 
-    gem install scout_rails_proxy
+    gem install scout_rails
     
-Signup for a [Scout](https://scoutapp.com) account and copy the config file to `RAILS_ROOT/config/scout_rails_proxy.yml`.
+Signup for a [Scout](https://scoutapp.com) account and copy the config file to `RAILS_ROOT/config/scout_rails.yml`.
 
 Your config file should look like:
 

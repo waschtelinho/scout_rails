@@ -1,4 +1,4 @@
-module ScoutRailsProxy::Instruments
+module ScoutRails::Instruments
   module Process
     class ProcessCpu
       def initialize(num_processors)
