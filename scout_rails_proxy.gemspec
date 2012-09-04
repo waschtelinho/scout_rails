@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "scout_rails_proxy/version"
 
 Gem::Specification.new do |s|
-  s.name        = "scout_rails_proxy_proxy"
+  s.name        = "scout_rails_proxy"
   s.version     = ScoutRailsProxy::VERSION
   s.authors     = ["Derek Haynes",'Andre Lewis','Bastian Schumacher']
   s.email       = ["support@scoutapp.com"]
