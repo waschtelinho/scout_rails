@@ -261,9 +261,21 @@ module ScoutRails
     end
     
     def request(url, &connector)
-      response           = nil
-      http               = Net::HTTP.new(url.host, url.port)
-      response           = http.start(&connector)
+      response = nil
+      
+      http_class = if config.settings['proxy']
+        Net::HTTP::Proxy(
+          config.settings['proxy']['host'], 
+          config.settings['proxy']['port'], 
+          config.settings['proxy']['user'], 
+          config.settings['proxy']['password']
+        )
+      else
+        Net::HTTP
+      end
+      
+      http = http_class.new url.host, url.port
+      response = http.start(&connector)
       logger.debug "got response: #{response.inspect}"
       case response
       when Net::HTTPSuccess, Net::HTTPNotModified
