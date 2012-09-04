@@ -3,15 +3,15 @@ $:.push File.expand_path("../lib", __FILE__)
 require "scout_rails/version"
 
 Gem::Specification.new do |s|
-  s.name        = "scout_rails"
+  s.name        = "scout_rails_proxy"
   s.version     = ScoutRails::VERSION
-  s.authors     = ["Derek Haynes",'Andre Lewis']
+  s.authors     = ["Derek Haynes",'Andre Lewis','Bastian Schumacher']
   s.email       = ["support@scoutapp.com"]
   s.homepage    = "https://github.com/scoutapp/scout_rails"
-  s.summary     = "Rails application performance monitoring"
+  s.summary     = "Rails application performance monitoring with proxy support"
   s.description = "Monitors a Ruby on Rails application and reports detailed metrics on performance to Scout, a hosted monitoring service."
 
-  s.rubyforge_project = "scout_rails"
+  # s.rubyforge_project = "scout_rails"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
