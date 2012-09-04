@@ -1,17 +1,17 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "scout_rails/version"
+require "scout_rails_proxy/version"
 
 Gem::Specification.new do |s|
-  s.name        = "scout_rails_proxy"
-  s.version     = ScoutRails::VERSION
+  s.name        = "scout_rails_proxy_proxy"
+  s.version     = ScoutRailsProxy::VERSION
   s.authors     = ["Derek Haynes",'Andre Lewis','Bastian Schumacher']
   s.email       = ["support@scoutapp.com"]
-  s.homepage    = "https://github.com/scoutapp/scout_rails"
+  s.homepage    = "https://github.com/scoutapp/scout_rails_proxy"
   s.summary     = "Rails application performance monitoring with proxy support"
   s.description = "Monitors a Ruby on Rails application and reports detailed metrics on performance to Scout, a hosted monitoring service."
 
-  # s.rubyforge_project = "scout_rails"
+  # s.rubyforge_project = "scout_rails_proxy"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

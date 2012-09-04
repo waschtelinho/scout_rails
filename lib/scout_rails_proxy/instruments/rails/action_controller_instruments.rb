@@ -1,7 +1,7 @@
-module ScoutRails::Instruments
+module ScoutRailsProxy::Instruments
   module ActionControllerInstruments
     def self.included(instrumented_class)
-      ScoutRails::Agent.instance.logger.debug "Instrumenting #{instrumented_class.inspect}"
+      ScoutRailsProxy::Agent.instance.logger.debug "Instrumenting #{instrumented_class.inspect}"
       instrumented_class.class_eval do
         unless instrumented_class.method_defined?(:perform_action_without_scout_instruments)
           alias_method :perform_action_without_scout_instruments, :perform_action
@@ -25,12 +25,12 @@ end
 
 if defined?(ActionController) && defined?(ActionController::Base)
   ActionController::Base.class_eval do
-    include ScoutRails::Tracer
-    include ::ScoutRails::Instruments::ActionControllerInstruments
+    include ScoutRailsProxy::Tracer
+    include ::ScoutRailsProxy::Instruments::ActionControllerInstruments
 
     def rescue_action_with_scout(exception)
-      ScoutRails::Agent.instance.store.track!("Errors/Request",1, :scope => nil)
-      ScoutRails::Agent.instance.store.ignore_transaction!
+      ScoutRailsProxy::Agent.instance.store.track!("Errors/Request",1, :scope => nil)
+      ScoutRailsProxy::Agent.instance.store.ignore_transaction!
       rescue_action_without_scout exception
     end
 
@@ -38,9 +38,9 @@ if defined?(ActionController) && defined?(ActionController::Base)
     alias_method :rescue_action, :rescue_action_with_scout
     protected :rescue_action
   end
-  ScoutRails::Agent.instance.logger.debug "Instrumenting ActionView::Template"
+  ScoutRailsProxy::Agent.instance.logger.debug "Instrumenting ActionView::Template"
   ActionView::Template.class_eval do
-    include ::ScoutRails::Tracer
+    include ::ScoutRailsProxy::Tracer
     instrument_method :render, :metric_name => 'View/#{path[%r{^(/.*/)?(.*)$},2]}/Rendering', :scope => true
   end
 end

@@ -1,4 +1,4 @@
-module ScoutRails::Instruments
+module ScoutRailsProxy::Instruments
   module Process
     class ProcessMemory
       def run

@@ -1,6 +1,6 @@
 # The store encapsolutes the logic that (1) saves instrumented data by Metric name to memory and (2) maintains a stack (just an Array)
-# of instrumented methods that are being called. It's accessed via +ScoutRails::Agent.instance.store+. 
-class ScoutRails::Store
+# of instrumented methods that are being called. It's accessed via +ScoutRailsProxy::Agent.instance.store+. 
+class ScoutRailsProxy::Store
   attr_accessor :metric_hash
   attr_accessor :transaction_hash
   attr_accessor :stack
@@ -36,7 +36,7 @@ class ScoutRails::Store
   # (2) Adds a StackItem to the stack. This StackItem is returned and later used to validate the item popped off the stack
   # when an instrumented code block completes.
   def record(metric_name)
-    item = ScoutRails::StackItem.new(metric_name)
+    item = ScoutRailsProxy::StackItem.new(metric_name)
     stack << item
     item
   end
@@ -51,7 +51,7 @@ class ScoutRails::Store
     # unbalanced stack check - unreproducable cases have seen this occur. when it does, sets a Thread variable 
     # so we ignore further recordings. +Store#reset_transaction!+ resets this. 
     if item != sanity_check_item
-      ScoutRails::Agent.instance.logger.warn "Scope [#{Thread::current[:scout_scope_name]}] Popped off stack: #{item.inspect} Expected: #{sanity_check_item.inspect}. Aborting."
+      ScoutRailsProxy::Agent.instance.logger.warn "Scope [#{Thread::current[:scout_scope_name]}] Popped off stack: #{item.inspect} Expected: #{sanity_check_item.inspect}. Aborting."
       ignore_transaction!
       return
     end
@@ -59,14 +59,14 @@ class ScoutRails::Store
     if last=stack.last
       last.children_time += duration
     end
-    meta = ScoutRails::MetricMeta.new(item.metric_name, :desc => options[:desc])
+    meta = ScoutRailsProxy::MetricMeta.new(item.metric_name, :desc => options[:desc])
     meta.scope = nil if stack_empty
     
     # add backtrace for slow calls ... how is exclusive time handled?
     if duration > 0.5 and !stack_empty
       meta.extra = {:backtrace => caller.find_all { |c| c =~ /\/app\//}}
     end
-    stat = transaction_hash[meta] || ScoutRails::MetricStats.new(!stack_empty)
+    stat = transaction_hash[meta] || ScoutRailsProxy::MetricStats.new(!stack_empty)
     
     stat.update!(duration,duration-item.children_time)
     transaction_hash[meta] = stat   
@@ -101,9 +101,9 @@ class ScoutRails::Store
     categories = categories(metrics)
     aggregates = {}
     categories.each do |cat|
-      agg_meta=ScoutRails::MetricMeta.new("#{cat}/all")
+      agg_meta=ScoutRailsProxy::MetricMeta.new("#{cat}/all")
       agg_meta.scope = parent_meta.metric_name
-      agg_stats = ScoutRails::MetricStats.new
+      agg_stats = ScoutRailsProxy::MetricStats.new
       metrics.each do |meta,stats|
         if meta.metric_name =~ /\A#{cat}\//
           agg_stats.combine!(stats) 
@@ -118,7 +118,7 @@ class ScoutRails::Store
   def store_sample(uri,transaction_hash,parent_meta,parent_stat,options = {})    
     @transaction_sample_lock.synchronize do
       if parent_stat.total_call_time >= 2 and (@sample.nil? or (@sample and parent_stat.total_call_time > @sample.total_call_time))
-        @sample = ScoutRails::TransactionSample.new(uri,parent_meta.metric_name,parent_stat.total_call_time,transaction_hash.dup)
+        @sample = ScoutRailsProxy::TransactionSample.new(uri,parent_meta.metric_name,parent_stat.total_call_time,transaction_hash.dup)
       end
     end
   end
@@ -130,9 +130,9 @@ class ScoutRails::Store
   # :scope => If provided, overrides the default scope. 
   # :exclusive_time => Sets the exclusive time for the method. If not provided, uses +call_time+.
   def track!(metric_name,call_time,options = {})
-     meta = ScoutRails::MetricMeta.new(metric_name)
+     meta = ScoutRailsProxy::MetricMeta.new(metric_name)
      meta.scope = options[:scope] if options.has_key?(:scope)
-     stat = metric_hash[meta] || ScoutRails::MetricStats.new
+     stat = metric_hash[meta] || ScoutRailsProxy::MetricStats.new
      stat.update!(call_time,options[:exclusive_time] || call_time)
      metric_hash[meta] = stat
   end

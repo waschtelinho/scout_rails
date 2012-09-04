@@ -1,4 +1,4 @@
-class ScoutRails::TransactionSample
+class ScoutRailsProxy::TransactionSample
   attr_reader :metric_name, :total_call_time, :metrics, :meta, :uri
   
   def initialize(uri,metric_name,total_call_time,metrics)

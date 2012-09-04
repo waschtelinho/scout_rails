@@ -1,4 +1,4 @@
-module ScoutRails
+module ScoutRailsProxy
   # The agent gathers performance data from a Ruby application. One Agent instance is created per-Ruby process. 
   #
   # Each Agent object creates a worker thread (unless monitoring is disabled or we're forking). 
@@ -33,24 +33,24 @@ module ScoutRails
     def initialize(options = {})
       @started = false
       @options ||= options
-      @store = ScoutRails::Store.new
-      @layaway = ScoutRails::Layaway.new
-      @config = ScoutRails::Config.new(options[:config_path])
+      @store = ScoutRailsProxy::Store.new
+      @layaway = ScoutRailsProxy::Layaway.new
+      @config = ScoutRailsProxy::Config.new(options[:config_path])
       @metric_lookup = Hash.new
-      @process_cpu=ScoutRails::Instruments::Process::ProcessCpu.new(environment.processors)
-      @process_memory=ScoutRails::Instruments::Process::ProcessMemory.new
+      @process_cpu=ScoutRailsProxy::Instruments::Process::ProcessCpu.new(environment.processors)
+      @process_memory=ScoutRailsProxy::Instruments::Process::ProcessMemory.new
     end
     
     def environment
-      @environment ||= ScoutRails::Environment.new
+      @environment ||= ScoutRailsProxy::Environment.new
     end
     
-    # This is called via +ScoutRails::Agent.instance.start+ when ScoutRails is required in a Ruby application.
+    # This is called via +ScoutRailsProxy::Agent.instance.start+ when ScoutRailsProxy is required in a Ruby application.
     # It initializes the agent and starts the worker thread (if appropiate).
     def start(options = {})
       @options.merge!(options)
       init_logger
-      logger.info "Attempting to start Scout Agent [#{ScoutRails::VERSION}] on [#{Socket.gethostname}]"
+      logger.info "Attempting to start Scout Agent [#{ScoutRailsProxy::VERSION}] on [#{Socket.gethostname}]"
       if !config.settings['monitor'] and !@options[:force]
         logger.warn "Monitoring isn't enabled for the [#{environment.env}] environment."
         return false
@@ -72,7 +72,7 @@ module ScoutRails
       end
       start_worker_thread
       handle_exit
-      logger.info "Scout Agent [#{ScoutRails::VERSION}] Initialized"
+      logger.info "Scout Agent [#{ScoutRailsProxy::VERSION}] Initialized"
     end
     
     # Placeholder: store metrics locally on exit so those in memory aren't lost. Need to decide
@@ -94,7 +94,7 @@ module ScoutRails
     end
     
     def init_logger
-      @log_file = "#{log_path}/scout_rails.log"
+      @log_file = "#{log_path}/scout_rails_proxy.log"
       @logger = Logger.new(@log_file)
       @logger.level = Logger::DEBUG
       def logger.format_message(severity, timestamp, progname, msg)
@@ -123,7 +123,7 @@ module ScoutRails
       Unicorn::HttpServer.class_eval do
         old = instance_method(:worker_loop)
         define_method(:worker_loop) do |worker|
-          ScoutRails::Agent.instance.start_worker_thread
+          ScoutRailsProxy::Agent.instance.start_worker_thread
           old.bind(self).call(worker)
         end
       end
@@ -316,4 +316,4 @@ module ScoutRails
     end
     
   end # class Agent
-end # module ScoutRails
+end # module ScoutRailsProxy

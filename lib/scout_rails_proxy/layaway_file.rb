@@ -1,7 +1,7 @@
 # Logic for the serialized file access
-class ScoutRails::LayawayFile
+class ScoutRailsProxy::LayawayFile
   def path
-    "#{ScoutRails::Agent.instance.log_path}/scout_rails.db"
+    "#{ScoutRailsProxy::Agent.instance.log_path}/scout_rails_proxy.db"
   end
 
   def dump(object)
@@ -10,13 +10,13 @@ class ScoutRails::LayawayFile
 
   def load(dump)
     if dump.size == 0
-      ScoutRails::Agent.instance.logger.debug("No data in layaway file.")
+      ScoutRailsProxy::Agent.instance.logger.debug("No data in layaway file.")
       return nil
     end
     Marshal.load(dump)
   rescue ArgumentError, TypeError => e
-    ScoutRails::Agent.instance.logger.debug("Error loading data from layaway file: #{e.inspect}")
-    ScoutRails::Agent.instance.logger.debug(e.backtrace.inspect)
+    ScoutRailsProxy::Agent.instance.logger.debug("Error loading data from layaway file: #{e.inspect}")
+    ScoutRailsProxy::Agent.instance.logger.debug(e.backtrace.inspect)
     nil
   end
 
@@ -35,8 +35,8 @@ class ScoutRails::LayawayFile
       end
     end
   rescue Errno::ENOENT, Exception  => e
-    ScoutRails::Agent.instance.logger.error(e.message)
-    ScoutRails::Agent.instance.logger.debug(e.backtrace.split("\n"))
+    ScoutRailsProxy::Agent.instance.logger.error(e.message)
+    ScoutRailsProxy::Agent.instance.logger.debug(e.backtrace.split("\n"))
   end
 
   def get_data(f)

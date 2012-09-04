@@ -1,5 +1,5 @@
 # Stats that are associated with each instrumented method. 
-class ScoutRails::MetricStats
+class ScoutRailsProxy::MetricStats
   attr_accessor :call_count
   attr_accessor :min_call_time
   attr_accessor :max_call_time

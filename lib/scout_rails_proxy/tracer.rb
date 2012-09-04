@@ -6,7 +6,7 @@
 #   we created earlier. 
 # * Once verified, the metrics for the recording session are merged into the in-memory Store#metric_hash. The current scope
 #   is also set for the metric (if Thread::current[:scout_scope_name] isn't nil).
-module ScoutRails::Tracer
+module ScoutRailsProxy::Tracer
   def self.included(klass)
     klass.extend ClassMethods
   end
@@ -15,7 +15,7 @@ module ScoutRails::Tracer
     
     # Use to trace a method call, possibly reporting slow transaction traces to Scout. 
     def trace(metric_name, options = {}, &block)
-      ScoutRails::Agent.instance.store.reset_transaction!      
+      ScoutRailsProxy::Agent.instance.store.reset_transaction!      
       instrument(metric_name, options) do
         Thread::current[:scout_scope_name] = metric_name
         yield
@@ -29,23 +29,23 @@ module ScoutRails::Tracer
     def instrument(metric_name, options={}, &block)
       # don't instrument if (1) NOT inside a transaction and (2) NOT a Controller metric.
       if !Thread::current[:scout_scope_name] and metric_name !~ /\AController\//
-        ScoutRails::Agent.instance.logger.debug "Not instrumenting [#{metric_name}] - no scope."
+        ScoutRailsProxy::Agent.instance.logger.debug "Not instrumenting [#{metric_name}] - no scope."
         return yield
       end
       if options.delete(:scope)
         Thread::current[:scout_sub_scope] = metric_name 
       end
-      stack_item = ScoutRails::Agent.instance.store.record(metric_name)
+      stack_item = ScoutRailsProxy::Agent.instance.store.record(metric_name)
       begin
         yield
       ensure
         Thread::current[:scout_sub_scope] = nil if Thread::current[:scout_sub_scope] == metric_name
-        ScoutRails::Agent.instance.store.stop_recording(stack_item,options)
+        ScoutRailsProxy::Agent.instance.store.stop_recording(stack_item,options)
       end
     end
     
     def instrument_method(method,options = {})
-      ScoutRails::Agent.instance.logger.info "Instrumenting #{method}"
+      ScoutRailsProxy::Agent.instance.logger.info "Instrumenting #{method}"
       metric_name = options[:metric_name] || default_metric_name(method)
       return if !instrumentable?(method) or instrumented?(method,metric_name)
       class_eval instrumented_method_string(method, {:metric_name => metric_name, :scope => options[:scope]}), __FILE__, __LINE__
@@ -69,14 +69,14 @@ module ScoutRails::Tracer
     # The method must exist to be instrumented.
     def instrumentable?(method)
       exists = method_defined?(method) || private_method_defined?(method)
-      ScoutRails::Agent.instance.logger.warn "The method [#{self.name}##{method}] does not exist and will not be instrumented" unless exists
+      ScoutRailsProxy::Agent.instance.logger.warn "The method [#{self.name}##{method}] does not exist and will not be instrumented" unless exists
       exists
     end
     
     # +True+ if the method is already instrumented. 
     def instrumented?(method,metric_name)
       instrumented = method_defined?(_instrumented_method_name(method, metric_name))
-      ScoutRails::Agent.instance.logger.warn "The method [#{self.name}##{method}] has already been instrumented" if instrumented
+      ScoutRailsProxy::Agent.instance.logger.warn "The method [#{self.name}##{method}] has already been instrumented" if instrumented
       instrumented
     end
     
